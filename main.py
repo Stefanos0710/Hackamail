@@ -4,18 +4,14 @@ Routes for all public API endpoints
 """
 import os
 from dotenv import load_dotenv
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template, request
 import requests
 
 # Load environment variables from .env
 load_dotenv()
 
 app = Flask(__name__)
-MAIL_API_KEY = os.getenv("MAIL_API_KEY")
 MAIL_API_BASE_URL = "https://mail.hackclub.com"
-
-if not MAIL_API_KEY:
-    raise ValueError("MAIL_API_KEY not found")
 
 
 def make_api_request(endpoint):
@@ -31,9 +27,18 @@ def make_api_request(endpoint):
     Raises:
         Returns error JSON with 500 status on request failure
     """
+    # Get API key from request header
+    api_key = request.headers.get('X-API-Key')
+
+    if not api_key:
+        return jsonify({
+            "error": "API key required",
+            "details": "Please provide X-API-Key header"
+        }), 401
+
     try:
         headers = {
-            "Authorization": f"Bearer {MAIL_API_KEY}",
+            "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
         }
 
@@ -51,6 +56,17 @@ def make_api_request(endpoint):
             "error": f"Error retrieving data from {endpoint}",
             "details": str(e)
         }), 500
+
+
+@app.route("/")
+def index():
+    """
+    Main mailbox interface.
+
+    Returns:
+        HTML page with the cool mailbox UI
+    """
+    return render_template("mailbox.html")
 
 
 @app.route("/api/public/v1/me", methods=["GET"])
@@ -149,7 +165,6 @@ def get_lsv():
     """
     return make_api_request("/api/public/v1/lsv")
 
-
 @app.route("/api/public/v1/lsv/<lsv_type>/<lsv_id>", methods=["GET"])
 def get_lsv_by_type_and_id(lsv_type, lsv_id):
     """
@@ -165,29 +180,6 @@ def get_lsv_by_type_and_id(lsv_type, lsv_id):
         JSON object containing LSV data
     """
     return make_api_request(f"/api/public/v1/lsv/{lsv_type}/{lsv_id}")
-
-
-@app.route("/", methods=["GET"])
-def index():
-    """
-    API documentation route.
-
-    Returns:
-        JSON object listing all available endpoints
-    """
-    return jsonify({
-        "message": "HackClub Mail API Proxy",
-        "endpoints": [
-            {"path": "/api/public/v1/me", "method": "GET", "description": "Get current user information"},
-            {"path": "/api/public/v1/mail", "method": "GET", "description": "Get mail data (important)"},
-            {"path": "/api/public/v1/letters", "method": "GET", "description": "Get all letters"},
-            {"path": "/api/public/v1/letters/:id", "method": "GET", "description": "Get letter by ID"},
-            {"path": "/api/public/v1/packages", "method": "GET", "description": "Get all packages"},
-            {"path": "/api/public/v1/packages/:id", "method": "GET", "description": "Get package by ID"},
-            {"path": "/api/public/v1/lsv", "method": "GET", "description": "Get LSV data"},
-            {"path": "/api/public/v1/lsv/:type/:id", "method": "GET", "description": "Get LSV by type and ID"}
-        ]
-    })
 
 
 if __name__ == "__main__":

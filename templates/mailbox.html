@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📬 HackMail - Mailbox</title>
+
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Leaflet CSS for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">📬</div>
+            <h1 class="header-title">HackMail</h1>
+        </div>
+        <div class="header-right">
+            <div class="api-key-group">
+                <input
+                    type="password"
+                    id="apiKeyInput"
+                    class="api-key-input"
+                    placeholder="Enter API Key..."
+                >
+                <button id="saveKeyBtn" class="save-key-btn">💾 Save</button>
+            </div>
+            <button id="refreshBtn" class="refresh-btn">🔄 Load Mail</button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Statistics Cards -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-value" id="totalMail">0</div>
+                <div class="stat-label">📧 Mail</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalLetters">0</div>
+                <div class="stat-label">✉️ Letters</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalPackages">0</div>
+                <div class="stat-label">📦 Packages</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalAll">0</div>
+                <div class="stat-label">📊 Total</div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <h2 class="sidebar-title">Filter</h2>
+                <ul class="mail-categories">
+                    <li class="category-item active" data-category="all">
+                        <span>
+                            <span class="category-icon">📬</span>
+                            All
+                        </span>
+                        <span class="category-count">0</span>
+                    </li>
+                    <li class="category-item" data-category="mail">
+                        <span>
+                            <span class="category-icon">📧</span>
+                            Mail
+                        </span>
+                        <span class="category-count">0</span>
+                    </li>
+                    <li class="category-item" data-category="letters">
+                        <span>
+                            <span class="category-icon">✉️</span>
+                            Letters
+                        </span>
+                        <span class="category-count">0</span>
+                    </li>
+                    <li class="category-item" data-category="packages">
+                        <span>
+                            <span class="category-icon">📦</span>
+                            Packages
+                        </span>
+                        <span class="category-count">0</span>
+                    </li>
+                    <li class="category-item" data-category="unread">
+                        <span>
+                            <span class="category-icon">●</span>
+                            Unread
+                        </span>
+                        <span class="category-count">0</span>
+                    </li>
+                </ul>
+            </aside>
+
+            <!-- Mail List -->
+            <main class="mail-list-container">
+                <div class="mail-list-header">
+                    <h2 class="mail-list-title">Inbox</h2>
+                    <input
+                        type="text"
+                        id="searchBox"
+                        class="search-box"
+                        placeholder="🔍 Search..."
+                    >
+                </div>
+
+                <ul id="mailList" class="mail-list">
+                    <!-- Initial state -->
+                    <div class="empty-state">
+                        <div class="empty-icon">🔑</div>
+                        <div class="empty-title">Enter API Key</div>
+                        <div class="empty-text">Please enter your HackClub Mail API key above and click Save, then Load Mail.</div>
+                    </div>
+                </ul>
+            </main>
+        </div>
+    </div>
+
+    <!-- Mail Detail Modal -->
+    <div id="mailModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title" id="modalTitle">Mail Details</h2>
+                    <div class="modal-meta" id="modalMeta"></div>
+                </div>
+                <button class="modal-close" id="modalClose">×</button>
+            </div>
+            <div class="modal-body">
+                <!-- Details Grid -->
+                <div class="detail-section">
+                    <h3 class="detail-section-title">Information</h3>
+                    <div class="detail-grid" id="detailGrid"></div>
+                </div>
+
+                <!-- Map Section -->
+                <div class="detail-section" id="mapSection" style="display: none;">
+                    <h3 class="detail-section-title">📍 Location / Tracking</h3>
+                    <div class="map-container">
+                        <div id="detailMap"></div>
+                    </div>
+                </div>
+
+                <!-- Content Section -->
+                <div class="detail-section" id="contentSection">
+                    <h3 class="detail-section-title">Content</h3>
+                    <div class="detail-content" id="detailContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS for Maps -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Main JavaScript -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
